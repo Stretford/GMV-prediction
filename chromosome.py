@@ -27,7 +27,7 @@ class Rule: ##for a single rule: IF A IS GAUSSIAN(...) AND B IS GAUSSIAN(...) TH
         self.Gaussian1 = gaussian1
         self.Gaussian2 = gaussian2
         self.GaussianY = gaussiany
-    def __str__(self):
+    def __repr__(self):
         return ''.join(['IF A IS ', str(self.Gaussian1), ' AND B IS ', str(self.Gaussian2), ' THEN Y IS ', str(self.GaussianY)])
 
     def Defuzzify(self, x1, x2):
@@ -39,16 +39,17 @@ class Rule: ##for a single rule: IF A IS GAUSSIAN(...) AND B IS GAUSSIAN(...) TH
 class Chromosome: ##for a single chromosome consisting of several rules
     ruleNum = 0
     rule_sets = []
-    def __init__(self, rulesets):
+
+    def __init__(self, rulesets = []):
         self.rule_sets = rulesets
         self.ruleNum = len(self.rule_sets)
-        """
-        for i in range(0, rulenum):
-            r = Rule()
-            self.rule_sets.append(r)
-        """
 
-    def Defuzzify(self, x1, x2): ##calculate the predictive output via defuzzification of rules
+    def __repr__(self):
+        str = "\n".join(repr(rule) for rule in self.rule_sets)
+        return str
+
+
+    def defuzzify(self, x1, x2): ##calculate the predictive output via defuzzification of rules
         sums = weights = 0
         for i in range(0, self.ruleNum):
             amd = self.rule_sets[i].Defuzzify(x1, x2)
@@ -57,12 +58,19 @@ class Chromosome: ##for a single chromosome consisting of several rules
         return sums / weights
 
 
-def RandomRule(center_min, center_max, N_init):
+def randomize_rule(center_min, center_max, N_init):
     max_width = 2 * (center_max - center_min) / (N_init ** 0.5)
     g1 = Gaussian(random.uniform(center_min, center_max), random.uniform(0, max_width))
     g2 = Gaussian(random.uniform(center_min, center_max), random.uniform(0, max_width))
     gy = Gaussian(random.uniform(center_min, center_max), random.uniform(0, max_width))
     return Rule(g1, g2, gy)
+
+def randomize_chromosome(min, max, rulenum, n_init):
+    rule_sets = []
+    for i in range(0, rulenum):
+        rule = randomize_rule(min, max, n_init)
+        rule_sets.append(rule)
+    return Chromosome(rule_sets)
 
 
 def Intercross(p1, p2):
@@ -71,14 +79,6 @@ def Intercross(p1, p2):
     c2 = Chromosome()
     #for i in range(0, IntercrossPoint):
 
-rule_sets = []
-for i in range(9):
-    rule = RandomRule(7000, 12000, 18)
-    rule_sets.append(rule)
 
-c = Chromosome(rule_sets)
-y = c.Defuzzify(9700, 9900)
-#print rule
-print y
-#print(tool.gaussian(5000, 200, 4900))
+#print randomize_chromosome(4000, 7000, 9, 18)
 
