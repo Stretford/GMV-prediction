@@ -1,6 +1,7 @@
 __author__ = 'stretford'
 import chromosome
 
+
 class population:
     colony = []
     colony_size = 100
