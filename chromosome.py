@@ -40,9 +40,13 @@ class Chromosome: ##for a single chromosome consisting of several rules
     ruleNum = 0
     rule_sets = []
 
-    def __init__(self, rulesets = []):
-        self.rule_sets = rulesets
-        self.ruleNum = len(self.rule_sets)
+    def __init__(self, rulenum, rulesets=[]):
+        if rulesets:
+            self.rule_sets = rulesets
+            self.ruleNum = rulenum
+        else:
+            for i in range(0, rulenum):
+                self.rule_sets.append(-1)
 
     def __repr__(self):
         str = "\n".join(repr(rule) for rule in self.rule_sets)
@@ -70,15 +74,27 @@ def randomize_chromosome(min, max, rulenum, n_init):
     for i in range(0, rulenum):
         rule = randomize_rule(min, max, n_init)
         rule_sets.append(rule)
-    return Chromosome(rule_sets)
+    return Chromosome(rulenum, rule_sets)
 
 
 def Intercross(p1, p2):
-    IntercrossPoint = 2
-    c1 = Chromosome()
-    c2 = Chromosome()
-    #for i in range(0, IntercrossPoint):
+    intercross_point = 2
+    c = [i for i in range(0, intercross_point)]
+    for i in range(0, intercross_point):
+        c[i] = p1.rule_sets[i]
+        p1.rule_sets[i] = p2.rule_sets[i]
+        p2.rule_sets[i] = c[i]
 
+
+
+
+c1 = randomize_chromosome(900,1200,3,10)
+c2 = randomize_chromosome(900,1200,3,10)
+print('c1:' + repr(c1))
+print('c2:' + repr(c2))
+Intercross(c1, c2)
+print('c1:' + repr(c1))
+print('c2:' + repr(c2))
 
 #print randomize_chromosome(4000, 7000, 9, 18)
 
