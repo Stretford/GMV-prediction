@@ -45,6 +45,7 @@ class Rule:  # for a single rule: IF A IS GAUSSIAN(...) AND B IS GAUSSIAN(...) T
 class Chromosome:  # for a single chromosome consisting of several rules
     rule_num = 0
     rule_sets = []
+    fitness_score = 0
 
     def __init__(self, rule_num, rule_sets=[]):
         if rule_sets:
@@ -75,7 +76,7 @@ class Chromosome:  # for a single chromosome consisting of several rules
         else:
             gaussian.width *= 2 * random.random()
 
-    def fitness(self, inputs):  # calculate the fitness value of a chromosome for GA selection
+    def fitness(self, inputs):  # calculate the fitness value via inputs in forms of [(x1, x2, y),...]
         mse = 0
         for x1, x2, y in inputs:
             y_predict = self.defuzzify(x1, x2)
