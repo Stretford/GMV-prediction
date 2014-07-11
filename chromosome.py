@@ -57,13 +57,13 @@ class Chromosome:  # for a single chromosome consisting of several rules
 
     def __repr__(self):
         str = "\n".join(repr(rule) for rule in self.rule_sets)
-        return str
+        return str + "\n" + repr(self.fitness_score)
 
     def defuzzify(self, x1, x2):  # calculate the predictive output via defuzzification of rules
         sums = weights = 0
-        for i in range(0, self.ruleNum):
-            amd = self.rule_sets[i].Defuzzify(x1, x2)
-            sums += amd * self.rule_sets[i].GaussianY.Center
+        for i in range(0, self.rule_num):
+            amd = self.rule_sets[i].defuzzify(x1, x2)
+            sums += amd * self.rule_sets[i].gaussian_y.center
             weights += amd
         return sums / weights
 
@@ -76,28 +76,36 @@ class Chromosome:  # for a single chromosome consisting of several rules
         else:
             gaussian.width *= 2 * random.random()
 
-    def fitness(self, inputs):  # calculate the fitness value via inputs in forms of [(x1, x2, y),...]
+    def cal_fitness(self, inputs):  # calculate the fitness value via inputs in forms of [(x1, x2, y),...]
         mse = 0
         for x1, x2, y in inputs:
             y_predict = self.defuzzify(x1, x2)
             mse += (y_predict - y) ** 2
         mse /= len(inputs)
-        return mse
+        return mse ** 0.5
 
 
-def randomize_rule(center_min, center_max, n_init): # initialize a randomized rule given the bounding range
-    max_width = 2 * (center_max - center_min) / (n_init ** 0.5)
-    g1 = Gaussian(random.uniform(center_min, center_max), random.uniform(0, max_width))
-    g2 = Gaussian(random.uniform(center_min, center_max), random.uniform(0, max_width))
-    gy = Gaussian(random.uniform(center_min, center_max), random.uniform(0, max_width))
+def randomize_rule(ranges, n_init):  # initialize a randomized rule given the bounding range
+    center_min1 = ranges[0]
+    center_max1 = ranges[1]
+    center_min2 = ranges[2]
+    center_max2 = ranges[3]
+    center_min_y = ranges[4]
+    center_max_y = ranges[5]
+    width1 = 2 * (center_max1 - center_min1) / (n_init ** 0.5)
+    width2 = 2 * (center_max2 - center_min2) / (n_init ** 0.5)
+    width_y = 2 * (center_max_y - center_min_y) / (n_init ** 0.5)
+    g1 = Gaussian(random.uniform(center_min1, center_max1), random.uniform(0, width1))
+    g2 = Gaussian(random.uniform(center_min2, center_max2), random.uniform(0, width2))
+    gy = Gaussian(random.uniform(center_min_y, center_max_y), random.uniform(0, width_y))
     return Rule(g1, g2, gy)
 
 
-def randomize_chromosome(minimum, maximum, rule_num, n_init):
+def randomize_chromosome(ranges, rule_num):
 # initialize a randomized chromosome given the bounding range
     rule_sets = []
     for i in range(0, rule_num):
-        rule = randomize_rule(minimum, maximum, n_init)
+        rule = randomize_rule(ranges, rule_num)
         rule_sets.append(rule)
     return Chromosome(rule_num, rule_sets)
 
@@ -111,11 +119,4 @@ def intercross(p1, p2):  # intercross of two chromosomes for GA
         p2.rule_sets[i] = c[i]
 
 
-c = randomize_chromosome(900, 1200, 3, 10)
-print(c)
-print(' ')
-c.mutate()
-print(c)
-
-#print randomize_chromosome(4000, 7000, 9, 18)
 
