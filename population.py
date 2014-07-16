@@ -66,18 +66,3 @@ class population:
     def __str__(self):
         return "\n\n".join(repr(c) for c in self.colony)
 
-# test for GA
-inputs = test.data1
-ranges = test.ranges
-p = population(9, ranges)
-for i in range(0, 20):
-    for c in p.colony:
-        c.fitness_score = c.cal_fitness(inputs)
-    p.next_generation()
-    p.keep_size()
-
-print(p.best_gene())
-print(','.join(str(c.fitness_score) for c in p.colony))
-
-y = p.best_gene().defuzzify(1767307288, 1892712653)
-print(str(y))
